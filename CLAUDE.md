@@ -34,11 +34,18 @@ The website consumes the backend's **public REST API** (`/api/**`) and depends o
   runtimeConfig.public`).
 
 **When you change a DTO or endpoint shape**, regenerate the types so the website
-stays in sync (the generator runs as part of the Maven build; or build the admin
-project explicitly). After regeneration, expect `rest.ts` to change and update the
-website code that consumes it. Field optionality matters: `rest.ts` marks a field
-optional (`?`) only when the Java field carries `@NotNull` semantics per the
-plugin config (`@NotNull` → required, primitives → required).
+stays in sync. The generator is **not** bound to the build lifecycle — run it
+explicitly from `schlierelacht-admin/`:
+
+```bash
+./mvnw process-classes                # compile the changed DTOs first
+./mvnw typescript-generator:generate  # rewrite schlierelacht-website/shared/types/rest.ts
+```
+
+After regeneration, expect `rest.ts` to change and update the website code that
+consumes it. Field optionality matters: `rest.ts` marks a field optional (`?`)
+only when the Java field is nullable — fields carrying `@NotNull` (and primitives)
+become required. So an "optional" DTO field is simply one *without* `@NotNull`.
 
 Backend CORS for `/api/**` allows all origins with `GET`/`POST` only, sessions are
 `STATELESS`, and CSRF is disabled — so the public API is read-mostly and
