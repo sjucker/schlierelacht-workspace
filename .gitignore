@@ -1,0 +1,7 @@
+# This workspace repo only versions the root CLAUDE.md and README.
+# The actual projects are cloned into subdirectories and tracked by their own repos.
+/schlierelacht-admin/
+/schlierelacht-website/
+
+# IDE
+/.idea/
