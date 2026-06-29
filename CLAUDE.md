@@ -5,16 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 This is a **workspace wrapper**, not a project. It only versions this `CLAUDE.md`
-and the `README.md`. The two real projects live in their own Git repos and are
+and the `README.md`. The real projects live in their own Git repos and are
 cloned as siblings (excluded via `.gitignore`):
 
 - `schlierelacht-admin/` — Spring Boot backend + Vaadin admin UI (Java 25, Maven). Has its own `AGENTS.md` with
   backend-specific details.
 - `schlierelacht-website/` — Public website (Nuxt 4 / Vue 3, npm).
+- `schlierelacht-app/` — Flutter mobile app (Dart) consuming the same public API.
 
 Treat them as **one system**: the admin app is the backend that serves the public
-API, and the website is its only API consumer. A change to one side usually
-requires a coordinated change to the other.
+API; the website and the mobile app are its consumers. A change to a DTO or
+endpoint usually requires a coordinated change in the consumers.
 
 ## The coupling (most important thing to understand)
 
@@ -109,11 +110,38 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `app/utils/`.
 - Deployed on Netlify (prod + staging); images served via Cloudflare image delivery.
 
-## Working across both projects
+## Mobile app architecture notes (`schlierelacht-app/`)
+
+- **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`,
+  package `schlierelacht_app`).
+- Consumes the **same public `/api/**`** as the website. Native clients are not subject to CORS. Currently covers **News
+  ** (`/api/news`) and **Programm** — note the schedule is built client-side from `/api/artist` (each `AttractionDTO`
+  carries its `programm`), exactly like the website; there is no `/api/programm` endpoint.
+- **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must
+  be kept in sync with the Java DTOs** by hand. When a DTO changes, update the matching model + its `fromJson`.
+- Base URL: `lib/config.dart` reads
+  `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's
+  env-override-then-prod-fallback. Cloudflare image URLs use the same account id (`cloudflareImageUrl`).
+- Lightweight architecture: plain `http` + `FutureBuilder` (no Provider/Riverpod/Bloc). Markdown rendered with
+  `flutter_markdown`; images via `cached_network_image`. German formatting in `lib/utils/formatting.dart` (`de_CH`,
+  initialized in `main.dart`).
+- Common commands (run from `schlierelacht-app/`):
+
+  ```bash
+  flutter pub get
+  flutter analyze
+  flutter test
+  flutter run                                              # against prod API
+  flutter run --dart-define=API_BASE_URL=http://localhost:8080      # iOS sim → local backend
+  flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080       # Android emulator → local backend
+  ```
+
+## Working across the projects
 
 A typical end-to-end change (e.g. a new public-facing field or endpoint):
 
 1. Backend: add/modify the DTO and/or `*Endpoint`, plus service and any Flyway migration + jOOQ regen.
 2. Build the backend so `typescript-generator` rewrites `schlierelacht-website/shared/types/rest.ts`.
 3. Website: consume the updated type / endpoint in the relevant page or component.
-4. Run backend tests and website lint.
+4. Mobile app (if affected): update the matching hand-written model in `schlierelacht-app/lib/models/` and the UI.
+5. Run backend tests, website lint, and `flutter analyze`/`flutter test`.

@@ -2,6 +2,7 @@
 # The actual projects are cloned into subdirectories and tracked by their own repos.
 /schlierelacht-admin/
 /schlierelacht-website/
+/schlierelacht-app/
 
 # IDE
 /.idea/
