@@ -23,7 +23,7 @@ The website consumes the backend's **public REST API** (`/api/**`) and depends o
 **TypeScript types generated from the backend's Java DTOs**:
 
 - Backend endpoints live in `schlierelacht-admin/src/main/java/ch/schlierelacht/admin/rest/*Endpoint.java`, mapped under
-  `/api/...` (e.g. `/api/news`, `/api/artist`).
+  `/api/...` (e.g. `/api/news`, `/api/attraction`).
 - DTOs live in `schlierelacht-admin/src/main/java/ch/schlierelacht/admin/dto/` (classes ending in `DTO`, plus their
   enums).
 - The Maven `typescript-generator-maven-plugin` (configured in `schlierelacht-admin/pom.xml`) scans
@@ -115,8 +115,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 - **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`,
   package `schlierelacht_app`).
 - Consumes the **same public `/api/**`** as the website. Native clients are not subject to CORS. Currently covers **News
-  ** (`/api/news`) and **Programm** — note the schedule is built client-side from `/api/artist` (each `AttractionDTO`
-  carries its `programm`), exactly like the website; there is no `/api/programm` endpoint.
+  ** (`/api/news`) and **Programm** (`/api/programm`) — the schedule is a flat, pre-sorted list of programm points
+  (`ProgrammPointDTO` = a `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, exactly
+  like the website. Attraction detail pages use `/api/attraction/{externalId}`.
 - **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must
   be kept in sync with the Java DTOs** by hand. When a DTO changes, update the matching model + its `fromJson`.
 - Base URL: `lib/config.dart` reads
