@@ -169,7 +169,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       in the browser), additional images, and upcoming entries linking to the **location detail**.
     - **Gastro** — `/api/v1/attraction?type=FOOD`, sorted by Nr. (`externalId`), searched over Nr. + name + operator.
     - **Wirtschaft & Gewerbe** — `/api/v1/event` (EVENT attractions, kept out of `/programm`).
-    - **Jahrgangstreffen** — registration form (`POST /api/v1/meetup`) and participant list (`GET /api/v1/meetup`);
+    - **Jahrgangstreffen** — opens straight into the participant list (`GET /api/v1/meetup`). Registration happens
+      **only on the website**: the app has no form and does not link to it.
       `MeetupJahrgang` labels mirror the website's `meetup-jahrgang.ts`.
     - **Favoriten** — favorites are **per attraction** (`attraction.externalId`; programm points have no unique id). Toggled via `widgets/favorite_button.dart`, persisted in `shared_preferences`
       (`services/prefs.dart`, exposed as a
