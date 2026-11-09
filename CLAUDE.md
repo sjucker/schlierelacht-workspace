@@ -207,6 +207,14 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   …) must stay in the browser — otherwise the app's own Datenschutz link would loop back into the app. iOS declares
   `applinks:schlierelacht.ch` in `ios/Runner/Runner.entitlements`. One-time manual steps (Play app-signing
   fingerprint, Associated Domains capability) are in the app's `README.md`.
+- **Offline**: every GET goes through `ApiClient._getJson`, which stores the last good response per path (incl.
+  query) in `api/api_cache.dart` (`shared_preferences`) and falls back to it on a transport error, a 10 s timeout or
+  a 5xx (not on 4xx). Served-from-cache JSON gets its programm `past` flags recomputed on the device
+  (`refreshPastFlags`, the same rule as the backend's `ProgrammEntryDTO.isPast` — keep them in sync).
+  `services/offline_warmup.dart` pre-loads all lists and every act / Gastro / location / news detail at startup and
+  on resume (at most every 3 h), so unopened screens work offline too. While cached data is shown,
+  `widgets/offline_banner.dart` (via `MaterialApp.builder`) shows "Offline – gespeicherter Stand vom …". Images are
+  cached only once viewed (`cached_network_image`); Mapbox tiles only as far as the SDK's own cache goes.
 - **API paths go through `lib/api/api_paths.dart`**: the `ApiPaths` constants are the single place the app's API versions are pinned — the `lib/api/*_api.dart` clients never spell out `/api/...`. A
   released build keeps calling the versions it was compiled against, so the backend must keep serving them until that build is gone.
 - **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must be kept in sync with the Java DTOs** by hand. When a DTO changes, update the
