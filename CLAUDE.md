@@ -156,6 +156,11 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
 - **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
+- **Colors** come from the logo, defined once in `lib/theme.dart` (`FestColors`: yellow `#FFF34E`, blue `#2B3585`,
+  light blue `#7CA6D8`; `buildFestTheme()`): blue = `primary` (app bars, buttons), light blue = `secondary`
+  (light tint `secondaryContainer` for section headers), yellow = `tertiary`/`tertiaryContainer` (highlights such as
+  the countdown banner and the hashtag card). Pages sit on a faint blue tint with white cards; the home tiles are
+  all blue with a white icon and label. Use `Theme.of(context).colorScheme` (or `FestColors`) rather than new hex values.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
