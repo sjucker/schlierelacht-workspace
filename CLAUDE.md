@@ -183,7 +183,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       `MeetupJahrgang` labels mirror the website's `meetup-jahrgang.ts`.
     - **Favoriten** — favorites are **per attraction** (`attraction.externalId`; programm points have no unique id). Toggled via `widgets/favorite_button.dart`, persisted in `shared_preferences`
       (`services/prefs.dart`, exposed as a
-      `ValueNotifier`), and mirrored to a per-act FCM topic. `favorites_screen.dart` filters `/api/v1/programm` to the favorited acts.
+      `ValueNotifier`). `favorites_screen.dart` filters `/api/v1/programm` to the favorited acts. Favorited acts get a
+      **local reminder** 15 min before each start (see "Notifications" below).
     - **Festplan** (`festplan_screen.dart`) — a Mapbox map (`mapbox_maps_flutter`, the website's custom style
       `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
       palette (`utils/location_labels.dart`) plus a legend; tap opens a sheet with distance, "Google Maps öffnen" and
@@ -225,9 +226,18 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   re-registers on **every launch** when permission is granted (the backend upserts), so rotated tokens arrive. A tapped
   push opens its `route` data (the admin "Push senden" field — `news`, `/programm/A12` or a full website URL) through
   `openDeepLink` in `utils/deep_links.dart` (uses the app's `navigatorKey`; same path → screen mapping as deep links);
-  in the foreground it shows a SnackBar with "Öffnen". Firebase init in
+  in the foreground it shows a SnackBar with "Öffnen". There are **no per-act topics** — the backend only sends to
+  `general`. Firebase init in
   `main.dart` is **guarded** — the app runs normally until `flutterfire configure` is run (`lib/firebase_options.dart` starts as a throwing placeholder that flutterfire overwrites). Uses options-based
   init, so no `google-services.json` / gms Gradle plugin is needed on Android.
+- **Notifications** (`services/notifications.dart`, `flutter_local_notifications` + `timezone`): the OS permission
+  check / prompt / "open settings" (one switch for push and reminders), and **favorite reminders** — scheduled on the
+  device, so they work offline and need no backend. `planReminders` (pure, tested) picks favorited entries with a
+  `fromTime`, 15 min before, as `Europe/Zurich` wall-clock time, capped at 50 (iOS allows 64 pending). Re-planned on
+  favorite / switch changes (`Prefs.remindersEnabled`, default on), at startup, and when `OfflineWarmup` reloads the
+  programm; a tap opens `/programm/<id>`. Android uses inexact alarms (no exact-alarm permission) and needs the
+  receivers in `AndroidManifest.xml` + core library desugaring; iOS sets the `UNUserNotificationCenter` delegate in
+  `AppDelegate.swift`.
 - **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers the distance labels on the Festplan and the location detail.
 - Base URL: `lib/config.dart` reads
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
@@ -247,7 +257,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   The Android 12+ splash screen draws only the icon's foreground in a circle, so `res/values(-night)-v31/styles.xml`
   set `windowSplashScreenIconBackgroundColor` to the same yellow — without it the foreground's square edges cut the circle.
 - Key packages: `http`, `shared_preferences`, `flutter_svg`, `url_launcher`, `geolocator`, `permission_handler`,
-  `firebase_core`, `firebase_messaging`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
+  `firebase_core`, `firebase_messaging`, `flutter_local_notifications`, `timezone`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
 - **Agentic development** (per docs.flutter.dev/ai/get-started): the official `dart-flutter` Claude Code plugin (Dart MCP server `dart mcp-server` + Flutter/Dart skills) is enabled in **both** this
   workspace's
   `.claude/settings.json` and `schlierelacht-app/.claude/settings.json`, so it is available whether Claude Code is
