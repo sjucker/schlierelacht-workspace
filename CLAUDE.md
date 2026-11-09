@@ -244,7 +244,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
   (`cloudflareImageUrl`). The Mapbox **public** token is read from `String.fromEnvironment('MAPBOX_ACCESS_TOKEN')` (same value as the website's
   `MAPBOX_API_TOKEN`).
-- Lightweight architecture: plain `http` + `FutureBuilder` (via `widgets/async_view.dart`; no Provider/Riverpod/Bloc). Markdown rendered with `flutter_markdown_plus`; images via `cached_network_image`.
+- Lightweight architecture: plain `http` + `FutureBuilder` (via `widgets/async_view.dart`; no Provider/Riverpod/Bloc). `AsyncView` keeps the shown data while a
+  new future loads (no spinner flash, scroll position kept) and on a failed reload shows a SnackBar instead of the
+  error state; list screens refresh with `onRefresh: _refresh`, which reloads and awaits `settled(_future)`. Markdown rendered with `flutter_markdown_plus`; images via `cached_network_image`.
   German formatting in
   `lib/utils/formatting.dart` (`de_CH`, initialized in `main.dart`).
 - **Runtime prerequisites** (features stay inert-but-safe until supplied):
