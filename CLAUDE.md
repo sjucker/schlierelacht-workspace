@@ -221,7 +221,10 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   matching model + its `fromJson`.
 - **Onboarding + permissions**: `screens/onboarding_screen.dart` runs once on first launch (gated by an
   `onboarding_complete` flag in `services/prefs.dart`) and requests **notification** + **location** permission.
-- **Push (FCM)**: `services/push.dart` requests permission, gets the token, registers it with the backend (`POST /api/v1/push/register`), and subscribes to the `general` topic. Firebase init in
+- **Push (FCM)**: `services/push.dart` requests permission, gets the token, registers it with the backend (`POST /api/v1/push/register`), and subscribes to the `general` topic. A tapped
+  push opens its `route` data (the admin "Push senden" field — `news`, `/programm/A12` or a full website URL) through
+  `openDeepLink` in `utils/deep_links.dart` (uses the app's `navigatorKey`; same path → screen mapping as deep links);
+  in the foreground it shows a SnackBar with "Öffnen". Firebase init in
   `main.dart` is **guarded** — the app runs normally until `flutterfire configure` is run (`lib/firebase_options.dart` starts as a throwing placeholder that flutterfire overwrites). Uses options-based
   init, so no `google-services.json` / gms Gradle plugin is needed on Android.
 - **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers the distance labels on the Festplan and the location detail.
