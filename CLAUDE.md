@@ -157,9 +157,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
-  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten and
-  Locations), and a footer with the social links and Impressum/Datenschutz (`legal_screen.dart`, static Markdown
-  copied from the website). Features:
+  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten),
+  and a footer with the social links (no copyright line and no Impressum/Datenschutz pages in the app). Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
       `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's
@@ -179,8 +178,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
       palette (`utils/location_labels.dart`) plus a legend; tap opens a sheet with distance, "Google Maps öffnen" and
       a link to the location detail.
-    - **Locations** (`/api/v1/location`, name search) and **location detail** (`/api/v1/location/{externalId}`: image,
-      map, Google Maps button, distance).
+    - **Location detail** (`/api/v1/location/{externalId}`: image, map, Google Maps button, distance) — reached from
+      the Festplan and the attraction detail; there is no Locations list in the app.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
     - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
@@ -193,7 +192,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 - **Push (FCM)**: `services/push.dart` requests permission, gets the token, registers it with the backend (`POST /api/v1/push/register`), and subscribes to the `general` topic. Firebase init in
   `main.dart` is **guarded** — the app runs normally until `flutterfire configure` is run (`lib/firebase_options.dart` starts as a throwing placeholder that flutterfire overwrites). Uses options-based
   init, so no `google-services.json` / gms Gradle plugin is needed on Android.
-- **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers distance labels on the map and locations list.
+- **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers the distance labels on the Festplan and the location detail.
 - Base URL: `lib/config.dart` reads
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
   (`cloudflareImageUrl`). The Mapbox **public** token is read from `String.fromEnvironment('MAPBOX_ACCESS_TOKEN')` (same value as the website's
