@@ -223,6 +223,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   flutter pub get
   flutter analyze
   flutter test
+  dart format lib test   # page_width 160 from analysis_options.yaml = Android Studio's formatter; always use it
   # Provide the Mapbox public token so the map works; add API_BASE_URL for a local backend:
   flutter run --dart-define=MAPBOX_ACCESS_TOKEN=pk...
   flutter run --dart-define=API_BASE_URL=http://localhost:8080 --dart-define=MAPBOX_ACCESS_TOKEN=pk...  # iOS sim → local backend
