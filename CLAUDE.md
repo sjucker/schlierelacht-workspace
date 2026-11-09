@@ -39,6 +39,11 @@ After regeneration, expect `rest.ts` to change and update the website code that 
 only when the Java field is nullable — fields carrying `@NotNull` (and primitives)
 become required. So an "optional" DTO field is simply one *without* `@NotNull`.
 
+All calls to the backend (`/api/**`) route through Cloudflare's WAF. To reduce backend load,
+all REST GET endpoints return custom `Cache-Control` headers directly in each response (with
+max-ages ranging from 1 minute for news up to 1 hour for files) so that Cloudflare can serve
+cached copies when appropriate.
+
 Backend CORS for `/api/**` allows all origins with `GET`/`POST` only, sessions are
 `STATELESS`, and CSRF is disabled — so the public API is read-mostly and unauthenticated. The Vaadin admin UI is the authenticated part and is separate. (The security matcher and the CORS registration
 both stay on `/api/**`, so they cover every version automatically.)

@@ -30,3 +30,12 @@ schlierelacht-workspace/
 | `schlierelacht-admin`   | https://github.com/sjucker/schlierelacht-admin   | Java / Spring Boot / Vaadin / jOOQ |
 | `schlierelacht-website` | https://github.com/sjucker/schlierelacht-website | Nuxt 4 / Vue 3                     |
 | `schlierelacht-app`     | https://github.com/sjucker/schlierelacht-app     | Flutter / Dart                     |
+
+## Infrastructure & Caching
+
+- **Cloudflare WAF:** All incoming backend calls (`/api/**`) route through Cloudflare's WAF (Web Application Firewall)
+  for security.
+- **Edge Caching:** Public GET API endpoints return custom `Cache-Control` headers directly in their responses (with
+  max-ages ranging from 1 minute for news up to 1 hour for download files), enabling Cloudflare to cache successful
+  responses and reduce load on the backend.
+
