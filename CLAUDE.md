@@ -129,6 +129,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   builds the `FirebaseMessaging` bean from a service-account file at `app.firebase-credentials`
   (env `FIREBASE_CREDENTIALS`); when unset the bean is `null` and sending is cleanly disabled.
 - Java version is **25**; Spring Boot 4, Vaadin 25.
+- **Vaadin agentic development** also works from this workspace root: the Vaadin docs MCP server is in the workspace
+  `.mcp.json`, and the workspace skill `.claude/skills/vaadin-devloop` delegates to the admin's generated
+  `vaadin-devloop` skill (don't copy or hand-edit that one — `./mvnw vaadin:install-dev-cli` rewrites it). From the
+  workspace, run the dev loop as
+  `cmd //c "schlierelacht-admin\.vaadin\vaadin-dev.cmd --app schlierelacht-admin <status|start|apply|stop>"`;
+  `bash .../vaadin-dev` fails here because it goes through the POSIX `mvnw`.
 
 ## Website architecture notes
 
