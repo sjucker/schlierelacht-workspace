@@ -162,7 +162,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   copied from the website). Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
-      `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's intro,
+      `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's
       act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`).
     - **Attraction detail** (`attraction_detail_screen.dart`, `/api/v1/attraction/{externalId}`) — shared by Programm
       and Gastro: main image, social links, description, files (`/attraction/{id}/files/{fileId}`, opened
