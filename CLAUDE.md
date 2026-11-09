@@ -158,7 +158,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten),
-  and a footer with the social links (no copyright line and no Impressum/Datenschutz pages in the app). Features:
+  and a footer with the social links and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
+  `config.dart`; app stores require a privacy policy reachable from the app). No copyright line, no Impressum. Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
       `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's
