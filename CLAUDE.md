@@ -147,18 +147,37 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
 - **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
-- Consumes the **same public `/api/**`** as the website. Native clients are not subject to CORS. A **landing page**
-  (`screens/landing_screen.dart`, the app entry point) shows the logo (`assets/logo.svg`, rendered with `flutter_svg`)
-  over a grid linking to every section. Features:
-    - **News** (`/api/v1/news`) and **Programm** (`/api/v1/programm`) — the schedule is a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a `ProgrammEntryDTO` joined with an
-      `AttractionRefDTO`), grouped per day client-side. Attraction/artist detail uses `/api/v1/attraction/{externalId}`.
-    - **Gastro** — `/api/v1/attraction?type=FOOD` (`AttractionType.food`), with client-side search.
+- Consumes the **same public `/api/**`** as the website and has **feature parity with it** (every website page has
+  an app screen; the app adds Favoriten, push, onboarding and distances on top). When a website page gains a feature,
+  mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
+  the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
+  `config.dart`) + "Freier Eintritt" note, a grid linking to every section (website nav order, plus Favoriten and
+  Locations), and a footer with the social links and Impressum/Datenschutz (`legal_screen.dart`, static Markdown
+  copied from the website). Features:
+    - **News** (`/api/v1/news`).
+    - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
+      `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's intro,
+      act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`, shared with Wirtschaft).
+    - **Attraction detail** (`attraction_detail_screen.dart`, `/api/v1/attraction/{externalId}`) — shared by Programm,
+      Gastro and Wirtschaft: main image, social links, description, files (`/attraction/{id}/files/{fileId}`, opened
+      in the browser), additional images, and upcoming entries linking to the **location detail**.
+    - **Gastro** — `/api/v1/attraction?type=FOOD`, sorted by Nr. (`externalId`), searched over Nr. + name + operator.
+    - **Wirtschaft & Gewerbe** — `/api/v1/event` (EVENT attractions, kept out of `/programm`).
+    - **Jahrgangstreffen** — registration form (`POST /api/v1/meetup`) and participant list (`GET /api/v1/meetup`);
+      `MeetupJahrgang` labels mirror the website's `meetup-jahrgang.ts`.
     - **Favoriten** — favorites are **per attraction** (`attraction.externalId`; programm points have no unique id). Toggled via `widgets/favorite_button.dart`, persisted in `shared_preferences`
       (`services/prefs.dart`, exposed as a
       `ValueNotifier`), and mirrored to a per-act FCM topic. `favorites_screen.dart` filters `/api/v1/programm` to the favorited acts.
-    - **Karte** — a Mapbox map (`mapbox_maps_flutter`) of `/api/v1/location` (each `LocationDTO` carries lat/long); one colour-coded circle per location, tap opens a sheet with distance + "open in
-      maps".
-    - **Sponsoren** (`/api/v1/sponsoring`) and **Locations** (`/api/v1/location`) list screens.
+    - **Festplan** (`festplan_screen.dart`) — a Mapbox map (`mapbox_maps_flutter`, the website's custom style
+      `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
+      palette (`utils/location_labels.dart`) plus a legend; tap opens a sheet with distance, "Google Maps öffnen" and
+      a link to the location detail.
+    - **Locations** (`/api/v1/location`, name search) and **location detail** (`/api/v1/location/{externalId}`: image,
+      map, Google Maps button, distance).
+    - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
+      Gönner as a name list.
+    - **Downloads** (`/api/v1/downloads`, by category), **Galerie** (`/api/v1/gallery`, fullscreen swipe viewer
+      `widgets/image_viewer.dart`, Facebook video link) and **Über uns** (`/api/v1/ok`: contact, OK members, teams).
 - **API paths go through `lib/api/api_paths.dart`**: the `ApiPaths` constants are the single place the app's API versions are pinned — the `lib/api/*_api.dart` clients never spell out `/api/...`. A
   released build keeps calling the versions it was compiled against, so the backend must keep serving them until that build is gone.
 - **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must be kept in sync with the Java DTOs** by hand. When a DTO changes, update the
@@ -186,6 +205,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `#FFF03F` background + inset foreground). Regenerate after changing the source with `dart run flutter_launcher_icons`.
 - Key packages: `http`, `shared_preferences`, `flutter_svg`, `url_launcher`, `geolocator`, `permission_handler`,
   `firebase_core`, `firebase_messaging`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown`, `intl`.
+- **Agentic development** (per docs.flutter.dev/ai/get-started): the official `dart-flutter` Claude Code plugin (Dart MCP server `dart mcp-server` + Flutter/Dart skills) is enabled in **both** this
+  workspace's
+  `.claude/settings.json` and `schlierelacht-app/.claude/settings.json`, so it is available whether Claude Code is
+  started here or inside the app. The Flutter team's proactive hot-reload rule lives in `schlierelacht-app/CLAUDE.md`,
+  which Claude Code picks up as soon as it works on files in the app folder. Started from the workspace, the Dart MCP
+  server's root is the workspace (not a Dart package) — pass `schlierelacht-app` as the root/project for its tools (analyze, tests, pub, `launch_app`).
 - Common commands (run from `schlierelacht-app/`):
 
   ```bash
