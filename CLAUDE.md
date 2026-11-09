@@ -153,22 +153,22 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
 - **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
-- Consumes the **same public `/api/**`** as the website and has **feature parity with it** (every website page has
-  an app screen; the app adds Favoriten, push, onboarding and distances on top). When a website page gains a feature,
-  mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
+- Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
+  onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
+  the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
-  `config.dart`) + "Freier Eintritt" note, a grid linking to every section (website nav order, plus Favoriten and
+  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten and
   Locations), and a footer with the social links and Impressum/Datenschutz (`legal_screen.dart`, static Markdown
   copied from the website). Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
       `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's intro,
-      act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`, shared with Wirtschaft).
-    - **Attraction detail** (`attraction_detail_screen.dart`, `/api/v1/attraction/{externalId}`) — shared by Programm,
-      Gastro and Wirtschaft: main image, social links, description, files (`/attraction/{id}/files/{fileId}`, opened
-      in the browser), additional images, and upcoming entries linking to the **location detail**.
+      act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`).
+    - **Attraction detail** (`attraction_detail_screen.dart`, `/api/v1/attraction/{externalId}`) — shared by Programm
+      and Gastro: main image, social links, description, files (`/attraction/{id}/files/{fileId}`, opened
+      in the browser), additional images (fullscreen swipe viewer `widgets/image_viewer.dart`), and upcoming entries
+      linking to the **location detail**.
     - **Gastro** — `/api/v1/attraction?type=FOOD`, sorted by Nr. (`externalId`), searched over Nr. + name + operator.
-    - **Wirtschaft & Gewerbe** — `/api/v1/event` (EVENT attractions, kept out of `/programm`).
     - **Jahrgangstreffen** — opens straight into the participant list (`GET /api/v1/meetup`). Registration happens
       **only on the website**: the app has no form and does not link to it.
       `MeetupJahrgang` labels mirror the website's `meetup-jahrgang.ts`.
@@ -183,8 +183,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       map, Google Maps button, distance).
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
-    - **Downloads** (`/api/v1/downloads`, by category), **Galerie** (`/api/v1/gallery`, fullscreen swipe viewer
-      `widgets/image_viewer.dart`, Facebook video link) and **Über uns** (`/api/v1/ok`: contact, OK members, teams).
+    - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
 - **API paths go through `lib/api/api_paths.dart`**: the `ApiPaths` constants are the single place the app's API versions are pinned — the `lib/api/*_api.dart` clients never spell out `/api/...`. A
   released build keeps calling the versions it was compiled against, so the backend must keep serving them until that build is gone.
 - **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must be kept in sync with the Java DTOs** by hand. When a DTO changes, update the
