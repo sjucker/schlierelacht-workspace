@@ -167,7 +167,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten and
   Social Media),
-  and a footer with the social links and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
+  and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). No copyright line, no Impressum. Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
@@ -184,7 +184,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **Favoriten** — favorites are **per attraction** (`attraction.externalId`; programm points have no unique id). Toggled via `widgets/favorite_button.dart`, persisted in `shared_preferences`
       (`services/prefs.dart`, exposed as a
       `ValueNotifier`). `favorites_screen.dart` filters `/api/v1/programm` to the favorited acts. Favorited acts get a
-      **local reminder** 15 min before each start (see "Notifications" below).
+      **local reminder** 15 min before each start (see "Notifications" below); the bell in its app bar opens Mitteilungen.
     - **Festplan** (`festplan_screen.dart`) — a Mapbox map (`mapbox_maps_flutter`, the website's custom style
       `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
       palette (`utils/location_labels.dart`) plus a legend; tap opens a sheet with distance, "Google Maps öffnen" and
@@ -237,7 +237,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   favorite / switch changes (`Prefs.remindersEnabled`, default on), at startup, and when `OfflineWarmup` reloads the
   programm; a tap opens `/programm/<id>`. Android uses inexact alarms (no exact-alarm permission) and needs the
   receivers in `AndroidManifest.xml` + core library desugaring; iOS sets the `UNUserNotificationCenter` delegate in
-  `AppDelegate.swift`.
+  `AppDelegate.swift`. `screens/notification_settings_screen.dart` ("Mitteilungen") lets users allow notifications
+  after skipping onboarding and toggle reminders.
 - **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers the distance labels on the Festplan and the location detail.
 - Base URL: `lib/config.dart` reads
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
