@@ -149,6 +149,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `locations` (free-text over name).
 - The programm list has no column header — a `USeparator` day divider (weekday emphasized, date secondary) starts each new day, in both the upcoming and the "Vergangene" group.
 - Deployed on Netlify (prod + staging); images served via Cloudflare image delivery.
+- **`public/.well-known/`** verifies the mobile app's App Links (`assetlinks.json`) and Universal Links
+  (`apple-app-site-association`, served as JSON via `routeRules` in `nuxt.config.ts`). Its paths must match the app's
+  claimed paths (see the app's "Deep links" note). Only `schlierelacht.ch` (PROD, `main`) matters for verification.
 
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
@@ -157,7 +160,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
-  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten),
+  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten and
+  Social Media),
   and a footer with the social links and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). No copyright line, no Impressum. Features:
     - **News** (`/api/v1/news`).
@@ -184,6 +188,20 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
     - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
+    - **Social Media** (`social_media_screen.dart`) — links to the Instagram feed, Facebook and LinkedIn (the
+      Instagram feed is **linked, not embedded**: embedding needs a Meta API token we don't have yet), plus a call to
+      post with `instagramHashtag` (`config.dart`): "Foto posten" copies the hashtag and opens `instagram://camera`
+      (falls back to the profile; `instagram` is in iOS `LSApplicationQueriesSchemes`).
+    - **Sharing** — `widgets/share_button.dart` (`share_plus`) in the app bar of the act / Gastro, news and location
+      detail screens shares the matching website URL (`websiteUrl` in `config.dart`).
+- **Deep links** (Android App Links / iOS Universal Links): `utils/deep_links.dart` maps website paths to screens
+  via `MaterialApp.onGenerateRoute` (Flutter's built-in deep linking; on a cold start every path prefix is pushed,
+  giving a natural back stack). Only the paths the app can show are claimed — **keep three places in sync**:
+  `deep_links.dart`, the `autoVerify` intent filter in `AndroidManifest.xml`, and the website's
+  `public/.well-known/apple-app-site-association`. Unclaimed paths (`/jahrgangstreffen` registration, `/datenschutz`,
+  …) must stay in the browser — otherwise the app's own Datenschutz link would loop back into the app. iOS declares
+  `applinks:schlierelacht.ch` in `ios/Runner/Runner.entitlements`. One-time manual steps (Play app-signing
+  fingerprint, Associated Domains capability) are in the app's `README.md`.
 - **API paths go through `lib/api/api_paths.dart`**: the `ApiPaths` constants are the single place the app's API versions are pinned — the `lib/api/*_api.dart` clients never spell out `/api/...`. A
   released build keeps calling the versions it was compiled against, so the backend must keep serving them until that build is gone.
 - **No code generator**: unlike the website's `rest.ts`, the Dart models under `lib/models/` are **hand-written and must be kept in sync with the Java DTOs** by hand. When a DTO changes, update the
