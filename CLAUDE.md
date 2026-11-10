@@ -179,7 +179,10 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
   Social Media),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
-  `config.dart`; app stores require a privacy policy reachable from the app). Below them the installed version ("Version 1.0.0 (1)", via
+  `config.dart`; app stores require a privacy policy reachable from the app). That page
+  (`schlierelacht-website/app/pages/datenschutz.vue`) has an **App «Schlierefäscht»** section covering on-device
+  data, location, push tokens and Crashlytics — **update it (and the store privacy forms) whenever the app starts
+  collecting or sending new data**. Below them the installed version ("Version 1.0.0 (1)", via
   `package_info_plus`; raise the build number in `pubspec.yaml` for every store upload, see the app's `README.md`).
   No copyright line, no Impressum. Features:
     - **News** (`/api/v1/news`).
