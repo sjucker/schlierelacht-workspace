@@ -251,6 +251,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `docs/firebase-setup.md`); CI must generate or restore them too. They hold no secrets (client API keys only
   identify the project; restrict them in the Google Cloud Console), but `google-services.json` is still in the
   history from before. iOS has no `GoogleService-Info.plist`; it initializes from `firebase_options.dart`.
+- **Crash reporting** (`services/crash_reporting.dart`, `firebase_crashlytics`): enabled from `main.dart` once Firebase
+  initialized, **release builds only** (debug builds switch collection off and keep the console output). Uncaught
+  Dart errors (`FlutterError.onError`, `PlatformDispatcher.onError`) are recorded **non-fatal** — they don't end the
+  app; native crashes count as crashes. Android applies the Crashlytics Gradle plugin 3.0.8 (uploads R8 mapping
+  files), which needs the Google Services plugin ≥ 4.4.1 (now 4.5.0) — keep both if `flutterfire configure` rewrites
+  the "FlutterFire Configuration" blocks. iOS has no dSYM upload yet, so native iOS crashes arrive unsymbolicated.
 - **Notifications** (`services/notifications.dart`, `flutter_local_notifications` + `timezone`): the OS permission
   check / prompt / "open settings" (one switch for push and reminders), and **favorite reminders** — scheduled on the
   device, so they work offline and need no backend. `planReminders` (pure, tested) picks favorited entries with a
@@ -291,7 +297,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   The Android 12+ splash screen draws only the icon's foreground in a circle, so `res/values-v31/styles.xml`
   sets `windowSplashScreenIconBackgroundColor` to the same yellow — without it the foreground's square edges cut the circle.
 - Key packages: `http`, `shared_preferences`, `flutter_svg`, `url_launcher`, `geolocator`, `permission_handler`,
-  `firebase_core`, `firebase_messaging`, `flutter_local_notifications`, `timezone`, `package_info_plus`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
+  `firebase_core`, `firebase_messaging`, `firebase_crashlytics`, `flutter_local_notifications`, `timezone`, `package_info_plus`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
 - **Agentic development** (per docs.flutter.dev/ai/get-started): the official `dart-flutter` Claude Code plugin (Dart MCP server `dart mcp-server` + Flutter/Dart skills) is enabled in **both** this
   workspace's
   `.claude/settings.json` and `schlierelacht-app/.claude/settings.json`, so it is available whether Claude Code is
