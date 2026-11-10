@@ -197,7 +197,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **Favoriten** — favorites are **per attraction** (`attraction.externalId`; programm points have no unique id). Toggled via `widgets/favorite_button.dart`, persisted in `shared_preferences`
       (`services/prefs.dart`, exposed as a
       `ValueNotifier`). `favorites_screen.dart` filters `/api/v1/programm` to the favorited acts. Favorited acts get a
-      **local reminder** 15 min before each start (see "Notifications" below); the bell in its app bar opens Mitteilungen.
+      **local reminder** 5, 15 (default) or 30 min before each start (see "Notifications" below); the bell in its app bar opens Mitteilungen.
     - **Festplan** (`festplan_screen.dart`) — a Mapbox map (`mapbox_maps_flutter`, the website's custom style
       `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
       palette (`utils/location_labels.dart`, created in one `createMulti` batch per layer) plus a legend; tap opens a
@@ -260,8 +260,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 - **Notifications** (`services/notifications.dart`, `flutter_local_notifications` + `timezone`): the OS permission
   check / prompt / "open settings" (one switch for push and reminders), and **favorite reminders** — scheduled on the
   device, so they work offline and need no backend. `planReminders` (pure, tested) picks favorited entries with a
-  `fromTime`, 15 min before, as `Europe/Zurich` wall-clock time, capped at 50 (iOS allows 64 pending). Re-planned on
-  favorite / switch changes (`Prefs.remindersEnabled`, default on), at startup, and when `OfflineWarmup` reloads the
+  `fromTime`, the chosen lead before (`Prefs.reminderLeadMinutes`: 5 / 15 / 30, default 15; a 5-min reminder may
+  arrive late, Android alarms are inexact), as `Europe/Zurich` wall-clock time, capped at 50 (iOS allows 64 pending). Re-planned on
+  favorite / switch / lead changes (`Prefs.remindersEnabled`, default on), at startup, and when `OfflineWarmup` reloads the
   programm; a tap opens `/programm/<id>`. Android uses inexact alarms (no exact-alarm permission) and needs the
   receivers in `AndroidManifest.xml` + core library desugaring; iOS sets the `UNUserNotificationCenter` delegate in
   `AppDelegate.swift`. `screens/notification_settings_screen.dart` ("Mitteilungen") lets users allow notifications
