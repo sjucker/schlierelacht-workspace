@@ -267,6 +267,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
   (`cloudflareImageUrl`). The Mapbox **public** token is read from `String.fromEnvironment('MAPBOX_ACCESS_TOKEN')` (same value as the website's
   `MAPBOX_API_TOKEN`).
+- **Images** (`widgets/cloudflare_image.dart`): **flexible variants are enabled** on the Cloudflare account. A
+  `CloudflareImage` up to 800 physical px wide (`cloudflareFlexibleMaxWidth`) requests its own box size —
+  `w=…,h=…,fit=cover|scale-down,quality=80`, rounded up to 100 px (`cloudflareSize`) so similar boxes share cache
+  entries; wider ones (full-width detail images) and the zoomable viewer keep `public` (capped at about 1200 × 768;
+  re-encoding those saved nothing and made some bigger). Every request sends `Accept: image/webp` (about 20 %
+  smaller); never accept AVIF, Flutter can't decode it. Measured on the 56 act photos: thumbnails 6.8 MB → 1.0 MB.
 - Lightweight architecture: plain `http` + `FutureBuilder` (via `widgets/async_view.dart`; no Provider/Riverpod/Bloc). `AsyncView` keeps the shown data while a
   new future loads (no spinner flash, scroll position kept) and on a failed reload shows a SnackBar instead of the
   error state; list screens refresh with `onRefresh: _refresh`, which reloads and awaits `settled(_future)`. Markdown rendered with `flutter_markdown_plus`; images via `cached_network_image`.
