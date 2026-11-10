@@ -179,7 +179,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
   Social Media),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
-  `config.dart`; app stores require a privacy policy reachable from the app). No copyright line, no Impressum. Features:
+  `config.dart`; app stores require a privacy policy reachable from the app). Below them the installed version ("Version 1.0.0 (1)", via
+  `package_info_plus`; raise the build number in `pubspec.yaml` for every store upload, see the app's `README.md`).
+  No copyright line, no Impressum. Features:
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
       `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's
@@ -289,7 +291,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   The Android 12+ splash screen draws only the icon's foreground in a circle, so `res/values-v31/styles.xml`
   sets `windowSplashScreenIconBackgroundColor` to the same yellow — without it the foreground's square edges cut the circle.
 - Key packages: `http`, `shared_preferences`, `flutter_svg`, `url_launcher`, `geolocator`, `permission_handler`,
-  `firebase_core`, `firebase_messaging`, `flutter_local_notifications`, `timezone`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
+  `firebase_core`, `firebase_messaging`, `flutter_local_notifications`, `timezone`, `package_info_plus`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
 - **Agentic development** (per docs.flutter.dev/ai/get-started): the official `dart-flutter` Claude Code plugin (Dart MCP server `dart mcp-server` + Flutter/Dart skills) is enabled in **both** this
   workspace's
   `.claude/settings.json` and `schlierelacht-app/.claude/settings.json`, so it is available whether Claude Code is
