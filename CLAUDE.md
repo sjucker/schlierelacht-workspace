@@ -187,8 +187,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       **local reminder** 15 min before each start (see "Notifications" below); the bell in its app bar opens Mitteilungen.
     - **Festplan** (`festplan_screen.dart`) — a Mapbox map (`mapbox_maps_flutter`, the website's custom style
       `festMapStyleUri`) of the `/api/v1/location` entries with `showInFestplan`; labelled circles in the website's
-      palette (`utils/location_labels.dart`) plus a legend; tap opens a sheet with distance, "Google Maps öffnen" and
-      a link to the location detail.
+      palette (`utils/location_labels.dart`, created in one `createMulti` batch per layer) plus a legend; tap opens a
+      sheet with distance, "Google Maps öffnen" and a link to the location detail. Without a Mapbox token visitors see
+      "Der Festplan ist im Moment nicht verfügbar." (the `--dart-define` hint only in debug builds).
     - **Location detail** (`/api/v1/location/{externalId}`: image, map, Google Maps button, distance) — reached from
       the Festplan and the attraction detail; there is no Locations list in the app.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
