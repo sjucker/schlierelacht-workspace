@@ -156,6 +156,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
 - **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
+- **App name "Schlierefäscht"** — shown under the icon and in the OS permission dialogs. Set in three places, keep
+  them in sync: `android:label` in `AndroidManifest.xml`, `CFBundleDisplayName` + `CFBundleName` in
+  `ios/Runner/Info.plist`, and `MaterialApp.title` in `main.dart` (Android's recent-apps label).
 - **Colors** come from the logo, defined once in `lib/theme.dart` (`FestColors`: yellow `#FFF34E`, blue `#2B3585`,
   light blue `#7CA6D8`; `buildFestTheme()`): blue = `primary` (app bars, buttons), light blue = `secondary`
   (light tint `secondaryContainer` for section headers), yellow = `tertiary`/`tertiaryContainer` (highlights such as
