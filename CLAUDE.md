@@ -260,6 +260,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   app; native crashes count as crashes. Android applies the Crashlytics Gradle plugin 3.0.8 (uploads R8 mapping
   files), which needs the Google Services plugin ≥ 4.4.1 (now 4.5.0) — keep both if `flutterfire configure` rewrites
   the "FlutterFire Configuration" blocks. iOS has no dSYM upload yet, so native iOS crashes arrive unsymbolicated.
+  **Manual test**: long-press the version at the bottom of the landing page → `widgets/crash_test_dialog.dart` sends
+  a non-fatal `CrashReportingTest` or crashes natively (`CrashReporting.crash()`); off (says so) unless
+  `CrashReporting.active`. Steps in the app's `README.md` ("Test crash reporting").
 - **Notifications** (`services/notifications.dart`, `flutter_local_notifications` + `timezone`): the OS permission
   check / prompt / "open settings" (one switch for push and reminders), and **favorite reminders** — scheduled on the
   device, so they work offline and need no backend. `planReminders` (pure, tested) picks favorited entries with a
