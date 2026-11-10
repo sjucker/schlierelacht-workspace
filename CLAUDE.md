@@ -164,10 +164,6 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   (light tint `secondaryContainer` for section headers), yellow = `tertiary`/`tertiaryContainer` (highlights such as
   the countdown banner and the hashtag card). Pages sit on a faint blue tint with white cards; the home tiles are
   all blue with a white icon and label. Use `Theme.of(context).colorScheme` (or `FestColors`) rather than new hex values.
-  **Dark mode** follows the device (`buildFestDarkTheme()`, `darkTheme` in `main.dart`): navy pages and cards
-  (`FestColors.dark*`), light blue as `primary` (brand blue would vanish), while the app bar, home tiles and yellow
-  highlights keep their logo colors. The logo has black lettering on transparency, so `widgets/fest_logo.dart` puts
-  it on a white card in dark mode; sponsor cards stay white too (their logos have white backgrounds).
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
