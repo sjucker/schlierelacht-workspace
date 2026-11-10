@@ -179,11 +179,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
   onboarding, distances and Meldungen on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
-  the app entry point) shows, **above the logo**, the most important active **Meldung**
-  (`widgets/message_card.dart`: the first entry of `/api/v1/message`, colored per priority, not dismissible,
-  "Alle Meldungen (n)" when there are more; reloaded every 2 min and on resume, hidden when none) — all active ones
-  are listed in `screens/messages_screen.dart`, also opened by a push with route `meldungen` (app-only path, not an
-  App Link). Then the logo, the website home's countdown to the festival start (`festStart` in
+  the app entry point) shows the logo, then the most important active **Meldung**
+  (`widgets/message_card.dart`: the first entry of `/api/v1/message`, **title only**, colored per priority, not
+  dismissible; reloaded every 2 min and on resume, hidden when none). A tap opens `screens/message_detail_screen.dart`
+  (title + markdown content, from the loaded message — no detail endpoint); the "Alle Meldungen (n)" link below it
+  opens `screens/messages_screen.dart` with all active ones, also opened by a push with route `meldungen` (app-only
+  path, not an App Link). Then the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
   and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
