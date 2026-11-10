@@ -167,6 +167,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   **Light mode only** — there is no dark theme: `MaterialApp` has no `darkTheme`, Android has no `values-night`
   styles (they would give the launch window and splash a black background), and `Info.plist` sets
   `UIUserInterfaceStyle` to `Light` so the native parts (status bar, share sheet, alerts) stay light too.
+- **Portrait only on phones**: `android:screenOrientation="portrait"` on `MainActivity` and only
+  `UIInterfaceOrientationPortrait` in `Info.plist`. iPads keep all orientations (`~ipad` list): locking them would need
+  `UIRequiresFullScreen`, which turns off Split View; Android 16+ likewise ignores the lock on large screens.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
