@@ -182,7 +182,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   the app entry point) shows the logo, then the most important active **Meldung**
   (`widgets/message_card.dart`: the first entry of `/api/v1/message`, **title only**, colored per priority, not
   dismissible; reloaded every 2 min and on resume, hidden when none). A tap opens `screens/message_detail_screen.dart`
-  (title + markdown content, from the loaded message — no detail endpoint); the "Alle Meldungen (n)" link below it
+  (title, "Erstellt am 03.09.2027, 18:30" and the markdown content, from the loaded message — no detail endpoint); the "Alle Meldungen (n)" link below it
   opens `screens/messages_screen.dart` with all active ones, also opened by a push with route `meldungen` (app-only
   path, not an App Link). Then the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
