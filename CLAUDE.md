@@ -130,10 +130,13 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   (env `FIREBASE_CREDENTIALS`); when unset the bean is `null` and sending is cleanly disabled.
 - **Meldungen (messages, app only)**: emergency alerts / warnings / infos for the app, table `message` (priority
   enum `message_priority` HIGH / MEDIUM / LOW, title, markdown content, active, `created_by` = the login's email,
-  `created_at`). Edited in `views/message/MessageView.java` ("Meldungen"; shows the creator's login name).
-  `rest/MessageEndpoint.java` serves `GET /api/v1/message`: the **active** ones, **most important first** —
-  priority (`dto/MessagePriority` declaration order), then newest (`MessageService` — the app shows the first entry
-  on its home screen, so this order is the rule). `created_by` is not exposed.
+  `created_at`, `published_at`). Edited in `views/message/MessageView.java` ("Meldungen"; shows the creator's login
+  name). Messages can be **prepared inactive**: `published_at` is stamped whenever a save switches a message from
+  inactive to active (`MessageService.markPublishedIfActivated`; editing an active one keeps it, off-and-on again
+  publishes anew) and is what the app shows. `rest/MessageEndpoint.java` serves `GET /api/v1/message`: the
+  **active** ones, **most important first** — priority (`dto/MessagePriority` declaration order), then most
+  recently **published** (`MessageService` — the app shows the first entry on its home screen, so this order is the
+  rule). `created_by` is not exposed.
 - Java version is **25**; Spring Boot 4, Vaadin 25.
 - **Vaadin agentic development** also works from this workspace root: the Vaadin docs MCP server is in the workspace
   `.mcp.json`, and the workspace skill `.claude/skills/vaadin-devloop` delegates to the admin's generated
@@ -182,7 +185,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   the app entry point) shows the logo, then the most important active **Meldung**
   (`widgets/message_card.dart`: the first entry of `/api/v1/message`, **title only**, colored per priority, not
   dismissible; reloaded every 2 min and on resume, hidden when none). A tap opens `screens/message_detail_screen.dart`
-  (title, "Erstellt am 03.09.2027, 18:30" and the markdown content, from the loaded message — no detail endpoint); the "Alle Meldungen (n)" link below it
+  (title, "Veröffentlicht am 03.09.2027, 18:30" = `publishedAt`, and the markdown content, from the loaded message — no detail endpoint); the "Alle Meldungen (n)" link below it
   opens `screens/messages_screen.dart` with all active ones, also opened by a push with route `meldungen` (app-only
   path, not an App Link). Then the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
