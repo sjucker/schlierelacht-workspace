@@ -199,7 +199,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       post with `instagramHashtag` (`config.dart`): "Foto posten" copies the hashtag and opens `instagram://camera`
       (falls back to the profile; `instagram` is in iOS `LSApplicationQueriesSchemes`).
     - **Sharing** — `widgets/share_button.dart` (`share_plus`) in the app bar of the act / Gastro, news and location
-      detail screens shares the matching website URL (`websiteUrl` in `config.dart`).
+      detail screens shares the matching website URL (`websiteUrl` in `config.dart`). Its `title` is a future derived
+      from the screen's data; `ShareButton` marks it handled, so a failed load isn't an unhandled error.
 - **Deep links** (Android App Links / iOS Universal Links): `utils/deep_links.dart` maps website paths to screens
   via `MaterialApp.onGenerateRoute` (Flutter's built-in deep linking; on a cold start every path prefix is pushed,
   giving a natural back stack). Only the paths the app can show are claimed — **keep three places in sync**:
