@@ -241,8 +241,13 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `openDeepLink` in `utils/deep_links.dart` (uses the app's `navigatorKey`; same path → screen mapping as deep links);
   in the foreground it shows a SnackBar with "Öffnen". There are **no per-act topics** — the backend only sends to
   `general`. Firebase init in
-  `main.dart` is **guarded** — the app runs normally until `flutterfire configure` is run (`lib/firebase_options.dart` starts as a throwing placeholder that flutterfire overwrites). Uses options-based
-  init, so no `google-services.json` / gms Gradle plugin is needed on Android.
+  `main.dart` is **guarded**, so the app still runs if Firebase fails to initialize. `flutterfire configure
+  --project=schlierelacht-app` has been run (steps in the app's `README.md`); its output is **committed**:
+  `lib/firebase_options.dart` (Android + iOS options, used by the options-based init), `firebase.json` (project and
+  app IDs for the next configure run) and `android/app/google-services.json` (read by the Google Services Gradle
+  plugin that flutterfire added to `android/app/build.gradle.kts`). None of these hold secrets — Firebase client API
+  keys only identify the project. iOS has no `GoogleService-Info.plist`; it initializes from `firebase_options.dart`.
+  Re-run `flutterfire configure` after adding a platform or app; format `firebase_options.dart` afterwards.
 - **Notifications** (`services/notifications.dart`, `flutter_local_notifications` + `timezone`): the OS permission
   check / prompt / "open settings" (one switch for push and reminders), and **favorite reminders** — scheduled on the
   device, so they work offline and need no backend. `planReminders` (pure, tested) picks favorited entries with a
@@ -267,7 +272,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   German formatting in
   `lib/utils/formatting.dart` (`de_CH`, initialized in `main.dart`).
 - **Runtime prerequisites** (features stay inert-but-safe until supplied):
-    - **Firebase** — run `flutterfire configure` (regenerates `lib/firebase_options.dart`). For iOS push, enable the Push Notifications capability + upload an APNs key in the Firebase console. Full
+    - **Firebase** — client configured with `flutterfire configure` (see Push above). For iOS push, still enable the Push Notifications capability + upload an APNs key in the Firebase console. Full
       step-by-step (client + backend service-account) in `schlierelacht-app/docs/firebase-setup.md`.
     - **Mapbox** — the **public** `pk.*` token via `--dart-define=MAPBOX_ACCESS_TOKEN=...`, and the **secret** downloads token in `android/gradle.properties` → `MAPBOX_DOWNLOADS_TOKEN=sk...` (needed
       to fetch the Android SDK; the Maven repo is configured in `android/build.gradle.kts`). `minSdk` is raised to 23 for Mapbox + Firebase.
