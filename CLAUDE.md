@@ -185,7 +185,10 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **News** (`/api/v1/news`).
     - **Programm** (`/api/v1/programm`) — a flat, pre-sorted list of programm points (`ProgrammPointDTO` = a
       `ProgrammEntryDTO` joined with an `AttractionRefDTO`), grouped per day client-side, with the website's
-      act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`).
+      act search + date + stage filters, and the upcoming / "Vergangene" split on the backend's `past` flag (`widgets/schedule_list.dart`),
+      so the list always starts with what is on now or next — no scrolling to today needed. Today's day header shows a
+      yellow **"HEUTE"**, acts on stage a red **"● JETZT"** (`isRunningAt` in `models/now_playing.dart`, the "Jetzt läuft"
+      card's rule) — in Programm and Favoriten (`ScheduleDaySection`), refreshed by the shared `utils/minute_clock.dart`.
     - **Attraction detail** (`attraction_detail_screen.dart`, `/api/v1/attraction/{externalId}`) — shared by Programm
       and Gastro: main image, social links, description, files (`/attraction/{id}/files/{fileId}`, opened
       in the browser), additional images (fullscreen swipe viewer `widgets/image_viewer.dart`), and upcoming entries
