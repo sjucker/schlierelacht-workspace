@@ -241,6 +241,10 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `AppDelegate.swift`. `screens/notification_settings_screen.dart` ("Mitteilungen") lets users allow notifications
   after skipping onboarding and toggle reminders.
 - **Location**: `services/geolocation.dart` (`geolocator` + fail-soft permission handling) powers the distance labels on the Festplan and the location detail.
+  A fix waits at most 10 s, then falls back to the last known position; `watchPosition()` keeps the distance current
+  (every 25 m) while those screens are open. Neither screen rebuilds its `MapWidget` on a position update (that could
+  reset the camera): the Festplan reads the position when a sheet opens, the location detail's distance label
+  listens to a `ValueNotifier` on its own.
 - Base URL: `lib/config.dart` reads
   `String.fromEnvironment('API_BASE_URL', defaultValue: 'https://schlierelacht-api.ch')` — mirrors the website's env-override-then-prod-fallback. Cloudflare image URLs use the same account id
   (`cloudflareImageUrl`). The Mapbox **public** token is read from `String.fromEnvironment('MAPBOX_ACCESS_TOKEN')` (same value as the website's
