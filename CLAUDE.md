@@ -165,7 +165,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
-  `config.dart`) + "Freier Eintritt" note, a grid linking to every app section (website nav order, plus Favoriten and
+  `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
+  and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
+  1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
   Social Media),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). No copyright line, no Impressum. Features:
