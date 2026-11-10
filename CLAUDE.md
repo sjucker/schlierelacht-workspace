@@ -128,6 +128,12 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   view. `config/FirebaseConfig.java`
   builds the `FirebaseMessaging` bean from a service-account file at `app.firebase-credentials`
   (env `FIREBASE_CREDENTIALS`); when unset the bean is `null` and sending is cleanly disabled.
+- **Meldungen (messages, app only)**: emergency alerts / warnings / infos for the app, table `message` (priority
+  enum `message_priority` HIGH / MEDIUM / LOW, title, markdown content, active, `created_by` = the login's email,
+  `created_at`). Edited in `views/message/MessageView.java` ("Meldungen"; shows the creator's login name).
+  `rest/MessageEndpoint.java` serves `GET /api/v1/message`: the **active** ones, **most important first** —
+  priority (`dto/MessagePriority` declaration order), then newest (`MessageService` — the app shows the first entry
+  on its home screen, so this order is the rule). `created_by` is not exposed.
 - Java version is **25**; Spring Boot 4, Vaadin 25.
 - **Vaadin agentic development** also works from this workspace root: the Vaadin docs MCP server is in the workspace
   `.mcp.json`, and the workspace skill `.claude/skills/vaadin-devloop` delegates to the admin's generated
@@ -171,9 +177,13 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `UIInterfaceOrientationPortrait` in `Info.plist`. iPads keep all orientations (`~ipad` list): locking them would need
   `UIRequiresFullScreen`, which turns off Split View; Android 16+ likewise ignores the lock on large screens.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
-  onboarding and distances on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
+  onboarding, distances and Meldungen on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
-  the app entry point) shows the logo, the website home's countdown to the festival start (`festStart` in
+  the app entry point) shows, **above the logo**, the most important active **Meldung**
+  (`widgets/message_card.dart`: the first entry of `/api/v1/message`, colored per priority, not dismissible,
+  "Alle Meldungen (n)" when there are more; reloaded every 2 min and on resume, hidden when none) — all active ones
+  are listed in `screens/messages_screen.dart`, also opened by a push with route `meldungen` (app-only path, not an
+  App Link). Then the logo, the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
   and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
