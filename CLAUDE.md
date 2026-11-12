@@ -126,8 +126,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   table). `service/PushService.java`
   sends via the Firebase Admin SDK (`firebase-admin` in `pom.xml`) — multicast to all tokens or to the `general` topic — and `views/notification/PushNotificationView.java` is the admin "Push senden"
   view. `config/FirebaseConfig.java`
-  builds the `FirebaseMessaging` bean from a service-account file at `app.firebase-credentials`
-  (env `FIREBASE_CREDENTIALS`); when unset the bean is `null` and sending is cleanly disabled.
+  builds the `FirebaseMessaging` bean from the service-account JSON **content** (not a path) in `app.firebase-credentials`
+  (env `FIREBASE_CREDENTIALS`, on Heroku `heroku config:set FIREBASE_CREDENTIALS="$(cat …json)"`); when unset or
+  invalid (logged, never the value) the bean is `null` and sending is cleanly disabled.
 - **Active attractions**: `attraction.active` (default `true`; the "Aktiv" checkbox and column in every attraction
   view via `AbstractAttractionView`, new ones start active). The public API serves **only active** attractions: the
   `ATTRACTION.ACTIVE` filter sits in `AttractionService` (lists, detail → 404, `/programm`, `/event`) and
