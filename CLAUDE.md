@@ -211,7 +211,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
   and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten,
-  Social Media, FAQ and Problem melden),
+  FAQ and Problem melden; the **Social Media** and **Über uns** tiles are hidden for now — commented out in
+  `_cards`, the screens stay and Über uns is still reachable via the `/info` deep link),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). That page
   (`schlierelacht-website/app/pages/datenschutz.vue`) has an **App «Schlierefäscht»** section covering on-device
@@ -247,7 +248,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       the Festplan and the attraction detail; there is no Locations list in the app.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
-    - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
+    - **Über uns** (`/api/v1/ok`: contact, OK members, teams; no home tile for now).
     - **FAQ** (`screens/faq_screen.dart`, `/api/v1/faq`, app only) — group headers in the backend's
       order, one `ExpansionTile` per question with its markdown answer; the search (`filterFaq`) filters over
       question + answer and shows matches expanded. Pre-loaded by `OfflineWarmup`; a push with route `faq` opens it.
@@ -266,7 +267,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
       permission changes, the input is saved first as `Prefs.problemReportDraft` and restored (then cleared) the next
       time the screen opens. Shows the
       emergency numbers 144 / 117 / 118 — it is not an emergency channel.
-    - **Social Media** (`social_media_screen.dart`) — links to the Instagram feed, Facebook and LinkedIn (the
+    - **Social Media** (`social_media_screen.dart`, no home tile for now) — links to the Instagram feed, Facebook and LinkedIn (the
       Instagram feed is **linked, not embedded**: embedding needs a Meta API token we don't have yet), plus a call to
       post with `instagramHashtag` (`config.dart`): "Foto posten" copies the hashtag and opens `instagram://camera`
       (falls back to the profile; `instagram` is in iOS `LSApplicationQueriesSchemes`).
