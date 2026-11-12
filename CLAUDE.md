@@ -128,6 +128,11 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   view. `config/FirebaseConfig.java`
   builds the `FirebaseMessaging` bean from a service-account file at `app.firebase-credentials`
   (env `FIREBASE_CREDENTIALS`); when unset the bean is `null` and sending is cleanly disabled.
+- **Active attractions**: `attraction.active` (default `true`; the "Aktiv" checkbox and column in every attraction
+  view via `AbstractAttractionView`, new ones start active). The public API serves **only active** attractions: the
+  `ATTRACTION.ACTIVE` filter sits in `AttractionService` (lists, detail → 404, `/programm`, `/event`) and
+  `AttractionFileService.findFile` (files → 404). Not exposed in the DTOs, so the consumers didn't change; the admin
+  views (Programm, Wirtschaft) still show inactive ones.
 - **Meldungen (messages, app only)**: emergency alerts / warnings / infos for the app, table `message` (priority
   enum `message_priority` HIGH / MEDIUM / LOW, title, markdown content, active, `created_by` = the login's email,
   `created_at`, `published_at`). Edited in `views/message/MessageView.java` ("Meldungen"; shows the creator's login
