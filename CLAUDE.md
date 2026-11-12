@@ -137,6 +137,13 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   **active** ones, **most important first** — priority (`dto/MessagePriority` declaration order), then most
   recently **published** (`MessageService` — the app shows the first entry on its home screen, so this order is the
   rule). `created_by` is not exposed.
+- **FAQ (app only)**: table `faq` (`group_name`, title = the question, markdown content, `sort_order`, active),
+  edited in `views/faq/FaqView.java` ("FAQ"; the group is a combo box of the existing names that also takes a new
+  one). `rest/FaqEndpoint.java` serves `GET /api/v1/faq` as `List<FaqGroupDTO>` (name + `FaqEntryDTO`s): active
+  entries only, grouped by the **trimmed** group name; groups by their lowest `sort_order`, then name; entries by
+  `sort_order`, then title (`FaqService` — the one place this rule lives). Group names are case-sensitive, and a group's
+  rank counts only its **active** entries; the admin grid lists all entries in this order via
+  `FaqService.findAllInAppOrder()`, with groups that have no active entry last.
 - Java version is **25**; Spring Boot 4, Vaadin 25.
 - **Vaadin agentic development** also works from this workspace root: the Vaadin docs MCP server is in the workspace
   `.mcp.json`, and the workspace skill `.claude/skills/vaadin-devloop` delegates to the admin's generated
@@ -180,7 +187,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `UIInterfaceOrientationPortrait` in `Info.plist`. iPads keep all orientations (`~ipad` list): locking them would need
   `UIRequiresFullScreen`, which turns off Split View; Android 16+ likewise ignores the lock on large screens.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
-  onboarding, distances and Meldungen on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
+  onboarding, distances, Meldungen and FAQ on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, then the most important active **Meldung**
   (`widgets/message_card.dart`: the first entry of `/api/v1/message`, **title only**, colored per priority, not
@@ -190,8 +197,8 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   path, not an App Link). Then the website home's countdown to the festival start (`festStart` in
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
   and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
-  1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten and
-  Social Media),
+  1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten,
+  Social Media and FAQ),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). That page
   (`schlierelacht-website/app/pages/datenschutz.vue`) has an **App «Schlierefäscht»** section covering on-device
@@ -228,6 +235,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
     - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
+    - **FAQ** (`screens/faq_screen.dart`, `/api/v1/faq`, app only, last home tile) — group headers in the backend's
+      order, one `ExpansionTile` per question with its markdown answer; the search (`filterFaq`) filters over
+      question + answer and shows matches expanded. Pre-loaded by `OfflineWarmup`; a push with route `faq` opens it.
     - **Social Media** (`social_media_screen.dart`) — links to the Instagram feed, Facebook and LinkedIn (the
       Instagram feed is **linked, not embedded**: embedding needs a Meta API token we don't have yet), plus a call to
       post with `instagramHashtag` (`config.dart`): "Foto posten" copies the hashtag and opens `instagram://camera`
