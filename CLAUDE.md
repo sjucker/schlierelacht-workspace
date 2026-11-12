@@ -149,6 +149,13 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `sort_order`, then title (`FaqService` — the one place this rule lives). Group names are case-sensitive, and a group's
   rank counts only its **active** entries; the admin grid lists all entries in this order via
   `FaqService.findAllInAppOrder()`, with groups that have no active entry last.
+- **Problem reports (app only, "Problem melden")**: `rest/ProblemReportEndpoint.java` takes
+  `POST /api/v1/problem-report` as **multipart**: JSON part `report` (`ProblemReportDTO`: name + description
+  required, phone / latitude / longitude optional) and an optional `photo` part. **Nothing is stored**:
+  `ProblemReportService` validates (400 on blank name/description, too long, photo not `image/*` or > 10 MB) and
+  `MailService.sendProblemReport` mails it — plain text with a Google Maps link, photo attached — to
+  `app.problem-report-email` (env `PROBLEM_REPORT_EMAIL`, comma-separated list allowed). Unlike the meetup mail, a
+  failed send **throws** and the endpoint answers 503, so the app can ask to retry.
 - Java version is **25**; Spring Boot 4, Vaadin 25.
 - **Vaadin agentic development** also works from this workspace root: the Vaadin docs MCP server is in the workspace
   `.mcp.json`, and the workspace skill `.claude/skills/vaadin-devloop` delegates to the admin's generated
@@ -192,7 +199,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `UIInterfaceOrientationPortrait` in `Info.plist`. iPads keep all orientations (`~ipad` list): locking them would need
   `UIRequiresFullScreen`, which turns off Split View; Android 16+ likewise ignores the lock on large screens.
 - Consumes the **same public `/api/**`** as the website and mirrors most of its pages (the app adds Favoriten, push,
-  onboarding, distances, Meldungen and FAQ on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
+  onboarding, distances, Meldungen, FAQ and Problem melden on top). **Deliberately not in the app**: Downloads, Galerie, Wirtschaft & Gewerbe, and
   the Jahrgangstreffen registration. When a mirrored website page gains a feature, mirror it in the app. Native clients are not subject to CORS. A **landing page** (`screens/landing_screen.dart`,
   the app entry point) shows the logo, then the most important active **Meldung**
   (`widgets/message_card.dart`: the first entry of `/api/v1/message`, **title only**, colored per priority, not
@@ -203,11 +210,11 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   `config.dart`) + "Freier Eintritt" note, a **"Jetzt läuft"** card (`widgets/now_playing_card.dart`: what is on now
   and the next 3 within 12 h, from `nowAndNext` in `models/now_playing.dart`; entries without an end time count as
   1 h; re-evaluated every minute, hidden when empty), a grid linking to every app section (website nav order, plus Favoriten,
-  Social Media and FAQ),
+  Social Media, FAQ and Problem melden),
   and a footer with the social links, a **Mitteilungen** link (`notification_settings_screen.dart`) and a **Datenschutz** link that opens the website's page (`datenschutzUrl` in
   `config.dart`; app stores require a privacy policy reachable from the app). That page
   (`schlierelacht-website/app/pages/datenschutz.vue`) has an **App «Schlierefäscht»** section covering on-device
-  data, location, push tokens and Crashlytics — **update it (and the store privacy forms) whenever the app starts
+  data, location, problem reports, push tokens and Crashlytics — **update it (and the store privacy forms) whenever the app starts
   collecting or sending new data**. Below them the installed version ("Version 1.0.0 (1)", via
   `package_info_plus`; raise the build number in `pubspec.yaml` for every store upload, see the app's `README.md`).
   No copyright line, no Impressum. Features:
@@ -240,9 +247,24 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
     - **Sponsoren** — `/api/v1/sponsoring` grouped by tier in the website's order, titles from `/sponsoring/type`,
       Gönner as a name list.
     - **Über uns** (`/api/v1/ok`: contact, OK members, teams).
-    - **FAQ** (`screens/faq_screen.dart`, `/api/v1/faq`, app only, last home tile) — group headers in the backend's
+    - **FAQ** (`screens/faq_screen.dart`, `/api/v1/faq`, app only) — group headers in the backend's
       order, one `ExpansionTile` per question with its markdown answer; the search (`filterFaq`) filters over
       question + answer and shows matches expanded. Pre-loaded by `OfflineWarmup`; a push with route `faq` opens it.
+    - **Problem melden** (`screens/problem_report_screen.dart`, app only, last home tile) — visitors report a problem
+      on the grounds: Name* + Beschreibung* (validated), optional Telefon, an optional photo (`image_picker`, camera
+      or gallery, scaled to ≤ 1600 px / quality 80 on the device) and an opt-in "Standort mitsenden" switch
+      (`GeolocationService.currentPosition`). Sent by `api/problem_report_api.dart` via `ApiClient.postMultipart`
+      (30 s timeout); a failure keeps the input and shows a SnackBar, success pops. Name and phone are remembered in
+      `Prefs` (`reporterName` / `reporterPhone`). The form is a `SingleChildScrollView`, not a lazy `ListView` —
+      `Form.validate()` only checks built fields. iOS needs `NSCameraUsageDescription` +
+      `NSPhotoLibraryUsageDescription`; Android needs no extra permission (system camera intent; `image_picker` only
+      asks for `CAMERA` if the merged manifest declares it). **Declined access** (`camera_access_denied` /
+      `photo_access_denied` from `image_picker`) opens a dialog: "Erneut versuchen" (Android only — iOS prompts just
+      once) and "Einstellungen öffnen" (`openAppSettings` from `permission_handler`); back in the app
+      (`AppLifecycleListener.onResume`) the camera / gallery opens again. Because **iOS ends the app** when a privacy
+      permission changes, the input is saved first as `Prefs.problemReportDraft` and restored (then cleared) the next
+      time the screen opens. Shows the
+      emergency numbers 144 / 117 / 118 — it is not an emergency channel.
     - **Social Media** (`social_media_screen.dart`) — links to the Instagram feed, Facebook and LinkedIn (the
       Instagram feed is **linked, not embedded**: embedding needs a Meta API token we don't have yet), plus a call to
       post with `instagramHashtag` (`config.dart`): "Foto posten" copies the hashtag and opens `instagram://camera`
@@ -336,7 +358,7 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
   The Android 12+ splash screen draws only the icon's foreground in a circle, so `res/values-v31/styles.xml`
   sets `windowSplashScreenIconBackgroundColor` to the same yellow — without it the foreground's square edges cut the circle.
 - Key packages: `http`, `shared_preferences`, `flutter_svg`, `url_launcher`, `geolocator`, `permission_handler`,
-  `firebase_core`, `firebase_messaging`, `firebase_crashlytics`, `flutter_local_notifications`, `timezone`, `package_info_plus`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
+  `firebase_core`, `firebase_messaging`, `firebase_crashlytics`, `flutter_local_notifications`, `timezone`, `package_info_plus`, `image_picker`, `mapbox_maps_flutter`, `cached_network_image`, `flutter_markdown_plus`, `intl`.
 - **Agentic development** (per docs.flutter.dev/ai/get-started): the official `dart-flutter` Claude Code plugin (Dart MCP server `dart mcp-server` + Flutter/Dart skills) is enabled in **both** this
   workspace's
   `.claude/settings.json` and `schlierelacht-app/.claude/settings.json`, so it is available whether Claude Code is
