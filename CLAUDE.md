@@ -43,6 +43,16 @@ Backend CORS for `/api/**` allows all origins with `GET`/`POST` only, sessions a
 `STATELESS`, and CSRF is disabled — so the public API is read-mostly and unauthenticated. The Vaadin admin UI is the authenticated part and is separate. (The security matcher and the CORS registration
 both stay on `/api/**`, so they cover every version automatically.)
 
+**Write requests are limited** (flood / abuse protection, no captcha): `security/ApiWriteGuardFilter` sits in the
+`/api/**` chain right after the CORS filter and checks every `POST` before its body is read — per client address
+(last `X-Forwarded-For` entry, the one the Heroku router appends; IPv6 per /64) and overall per resource → **429** with
+`Retry-After`; a `Content-Length` above the resource's cap → **413**, none at all → **411**. Its `RULES` list is the one
+place the limits live: problem-report 10 / 10 min per client, 100 / h overall, 12 MB; meetup 10 / 10 min, 200 / h,
+64 KB; push/register 30 / min, 600 / min, 64 KB; any other POST 30 / min per client, 64 KB — **give a new write
+endpoint its own rule**. Counters are in memory (`security/RateLimiter`), so per dyno and reset by a restart. Reaching
+an overall limit logs one ERROR per window (= one admin mail). The consumers need nothing: a 429 is the generic
+"Senden fehlgeschlagen" in the app. GETs are not limited.
+
 ## API versioning
 
 `schlierelacht-admin` has a single `main` branch, while the website runs `main`
