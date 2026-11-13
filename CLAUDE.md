@@ -184,7 +184,9 @@ Requires `.env` (copy from `.env.example`) for `MAPBOX_API_TOKEN`.
 
 ## Mobile app architecture notes (`schlierelacht-app/`)
 
-- **Flutter / Dart**, Material 3. Targets Android + iOS. Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
+- **Flutter / Dart**, Material 3. Targets Android + iOS (minimum **iOS 15**, `IPHONEOS_DEPLOYMENT_TARGET` in
+  `ios/Runner.xcodeproj/project.pbxproj`, required by Firebase and Mapbox; the iOS bundle id is
+  `ch.schlierelacht.schlierelachtApp`, Android `ch.schlierelacht.schlierelacht_app`). Scaffolded with `flutter create` (org `ch.schlierelacht`, package `schlierelacht_app`).
 - **App name "Schlierefäscht"** — shown under the icon and in the OS permission dialogs. Set in three places, keep
   them in sync: `android:label` in `AndroidManifest.xml`, `CFBundleDisplayName` + `CFBundleName` in
   `ios/Runner/Info.plist`, and `MaterialApp.title` in `main.dart` (Android's recent-apps label).
